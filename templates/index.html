@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}一覧{% endblock %}
+{% block content %}
+<section class="section">
+    <h2>Todo一覧</h2>
+    <p class="actions">
+        <a href="{{ url_for('new_get') }}" class="btn btn-primary">新規作成</a>
+    </p>
+    {% if todos %}
+    <table class="todo-table">
+        <thead>
+            <tr>
+                <th>タイトル</th>
+                <th>内容</th>
+                <th>期日</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for todo in todos %}
+            <tr>
+                <td>{{ todo.title }}</td>
+                <td>{{ todo.body or '-' }}</td>
+                <td>{{ todo.due_date or '-' }}</td>
+                <td>
+                    <a href="{{ url_for('edit_get', id=todo.id) }}" class="btn btn-sm">編集</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Todoがありません。新規作成から登録してください。</p>
+    {% endif %}
+</section>
+{% endblock %}

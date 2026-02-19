@@ -1,0 +1,32 @@
+# ===== 秘密情報（絶対にGitに含めない） =====
+.env
+credentials.json
+service-account*.json
+*-credentials.json
+line-calendar-bot-*.json
+*.pem
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+.env
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+*.log

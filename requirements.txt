@@ -1,0 +1,12 @@
+# Web フレームワーク
+Flask>=3.0.0,<4.0.0
+
+# 環境変数読み込み
+python-dotenv>=1.0.0
+
+# Google Sheets API
+gspread>=6.0.0
+google-auth>=2.0.0
+
+# 本番用 WSGI サーバー
+gunicorn>=21.0.0
