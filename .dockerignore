@@ -1,0 +1,32 @@
+.git
+.gitignore
+.DS_Store
+__pycache__/
+*.py[cod]
+*.log
+
+# local env / secrets
+.env
+.env.*
+credentials.json
+service-account*.json
+*-credentials.json
+line-calendar-bot-*.json
+*.pem
+
+# virtualenv
+venv/
+.venv/
+env/
+
+# editor
+.idea/
+.vscode/
+
+# cursor
+.cursor/
+
+# build artifacts
+dist/
+build/
+*.egg-info/

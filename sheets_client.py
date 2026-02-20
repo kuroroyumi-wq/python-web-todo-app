@@ -8,53 +8,77 @@ import os
 import uuid
 from datetime import datetime, timezone
 import gspread
+import google.auth
 from google.oauth2.service_account import Credentials
 
 
-def _get_credentials_info():
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+
+def _get_google_credentials():
     """
-    認証情報のdictを返す。
-    GOOGLE_SERVICE_ACCOUNT_JSON_PATH が設定されていればファイルから読み込む（そのまま貼り付け不要）。
-    なければ GOOGLE_SERVICE_ACCOUNT_JSON の文字列を使用。
+    Google 認証情報を取得して返す。
+
+    優先順位:
+    1) GOOGLE_SERVICE_ACCOUNT_JSON_PATH（ローカル向け）
+    2) GOOGLE_SERVICE_ACCOUNT_JSON（Render 等: 1行JSON）
+    3) Application Default Credentials（Cloud Run / gcloud ADC 等: JSONキー不要）
     """
     import json
 
     path = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON_PATH")
     if path:
-        # ファイルパス指定 → そのままのJSONファイルを読み込み（minify不要）
         path = os.path.expanduser(path)
         if not os.path.isfile(path):
             raise RuntimeError(f"認証ファイルが見つかりません: {path}")
         with open(path, "r", encoding="utf-8") as f:
             info = json.load(f)
-        return info
+        return Credentials.from_service_account_info(info, scopes=SCOPES)
 
     json_str = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
-    if not json_str:
-        raise RuntimeError(
-            "GOOGLE_SERVICE_ACCOUNT_JSON または GOOGLE_SERVICE_ACCOUNT_JSON_PATH を設定してください。"
-            "JSON_PATH を使うと、JSONを1行にする必要がありません。"
-        )
+    if json_str:
+        json_str = json_str.strip()
+        if not json_str:
+            raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON が空です。正しいJSON文字列を設定してください。")
+        try:
+            info = json.loads(json_str)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(
+                f"GOOGLE_SERVICE_ACCOUNT_JSON のJSON解析に失敗しました: {e}. "
+                "JSONは1行（minify）で貼り付けてください。"
+            )
+        return Credentials.from_service_account_info(info, scopes=SCOPES)
+
+    # Cloud Run 等: サービスに割り当てたサービスアカウントでADCを利用（JSONキー不要）
     try:
-        info = json.loads(json_str)
+        creds, _project_id = google.auth.default(scopes=SCOPES)
     except Exception as e:
-        raise RuntimeError(f"GOOGLE_SERVICE_ACCOUNT_JSON のJSON解析に失敗しました: {e}")
-    return info
+        raise RuntimeError(
+            "Google 認証情報を取得できませんでした。"
+            "Cloud Run を使う場合は、Cloud Run サービスにサービスアカウントを割り当ててください。"
+            "または GOOGLE_SERVICE_ACCOUNT_JSON(_PATH) を設定してください。"
+            f"（詳細: {e}）"
+        )
+
+    # 一部の認証情報は明示的にスコープ付与が必要
+    if getattr(creds, "requires_scopes", False) and hasattr(creds, "with_scopes"):
+        creds = creds.with_scopes(SCOPES)
+    return creds
 
 
 def _get_client():
     """gspreadクライアントを取得。環境変数から認証情報を読む。"""
-    info = _get_credentials_info()
-
-    spreadsheet_id = os.environ.get("SPREADSHEET_ID")
+    spreadsheet_id = os.environ.get("SPREADSHEET_ID", "").strip()
     if not spreadsheet_id:
-        raise RuntimeError("SPREADSHEET_ID が設定されていません。")
+        raise RuntimeError(
+            "SPREADSHEET_ID が設定されていません。"
+            "スプレッドシートURLの /d/ と /edit の間の文字列を設定してください。"
+        )
 
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive",
-    ]
-    creds = Credentials.from_service_account_info(info, scopes=scopes)
+    creds = _get_google_credentials()
     client = gspread.authorize(creds)
     return client.open_by_key(spreadsheet_id)
 
@@ -62,7 +86,7 @@ def _get_client():
 def _get_sheet():
     """対象シートを取得。"""
     spreadsheet = _get_client()
-    sheet_name = os.environ.get("SHEET_NAME", "todos")
+    sheet_name = os.environ.get("SHEET_NAME", "todos").strip() or "todos"
     return spreadsheet.worksheet(sheet_name)
 
 
