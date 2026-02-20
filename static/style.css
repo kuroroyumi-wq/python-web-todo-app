@@ -1,4 +1,4 @@
-/* Todoアプリ - 最小限のスタイル */
+/* Todoアプリ */
 * {
     box-sizing: border-box;
 }
@@ -6,12 +6,14 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.6;
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 1rem;
     color: #333;
     background: #fafafa;
 }
+
+/* ── Header / Footer ─────────────────────────────────────────────── */
 
 .header {
     border-bottom: 2px solid #2c3e50;
@@ -40,6 +42,8 @@ body {
     font-size: 0.85rem;
 }
 
+/* ── Flash messages ──────────────────────────────────────────────── */
+
 .flash-messages {
     list-style: none;
     padding: 0;
@@ -64,6 +68,8 @@ body {
     border: 1px solid #f5c6cb;
 }
 
+/* ── Section ─────────────────────────────────────────────────────── */
+
 .section {
     background: #fff;
     padding: 1.5rem;
@@ -76,9 +82,30 @@ body {
     color: #2c3e50;
 }
 
-.actions {
+/* ── Toolbar / Filters ───────────────────────────────────────────── */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
     margin-bottom: 1rem;
 }
+
+.filters {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.filter-label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-right: 0.15rem;
+    white-space: nowrap;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
 
 .btn {
     display: inline-block;
@@ -93,7 +120,7 @@ body {
 }
 
 .btn:hover {
-    opacity: 0.9;
+    opacity: 0.85;
 }
 
 .btn-primary {
@@ -108,8 +135,59 @@ body {
 
 .btn-sm {
     padding: 0.25rem 0.6rem;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
+
+.btn-active {
+    background: #3498db;
+    color: #fff;
+}
+
+.btn-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.15rem;
+    padding: 0;
+    line-height: 1;
+}
+
+.btn-toggle:hover {
+    transform: scale(1.15);
+}
+
+.inline-form {
+    display: inline;
+}
+
+/* ── Priority badges ─────────────────────────────────────────────── */
+
+.badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.badge-high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.badge-low {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+/* ── Todo table ──────────────────────────────────────────────────── */
 
 .todo-table {
     width: 100%;
@@ -118,7 +196,7 @@ body {
 
 .todo-table th,
 .todo-table td {
-    padding: 0.6rem;
+    padding: 0.6rem 0.5rem;
     text-align: left;
     border-bottom: 1px solid #eee;
 }
@@ -126,16 +204,52 @@ body {
 .todo-table th {
     background: #f8f9fa;
     font-weight: 600;
+    font-size: 0.85rem;
+    color: #555;
 }
 
 .todo-table tr:hover {
     background: #f8f9fa;
 }
 
+.col-status {
+    width: 3rem;
+    text-align: center;
+}
+
+.col-priority {
+    width: 5.5rem;
+}
+
+.col-date {
+    width: 6.5rem;
+}
+
+.col-desc {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.col-actions {
+    width: 4rem;
+}
+
+.row-done {
+    opacity: 0.55;
+}
+
+.text-done {
+    text-decoration: line-through;
+}
+
 .empty {
     color: #666;
     font-style: italic;
 }
+
+/* ── Forms ────────────────────────────────────────────────────────── */
 
 .todo-form .form-group {
     margin-bottom: 1rem;
@@ -153,16 +267,27 @@ body {
 
 .todo-form input[type="text"],
 .todo-form input[type="date"],
-.todo-form textarea {
+.todo-form textarea,
+.todo-form select {
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+    background: #fff;
 }
 
 .todo-form textarea {
     resize: vertical;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
 }
 
 .form-actions {
@@ -173,9 +298,29 @@ body {
     margin-right: 0.5rem;
 }
 
+/* ── Error ────────────────────────────────────────────────────────── */
+
 .error-message {
     color: #e74c3c;
     background: #fdf2f2;
     padding: 1rem;
     border-radius: 4px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .col-desc {
+        display: none;
+    }
 }

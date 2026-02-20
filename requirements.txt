@@ -8,5 +8,8 @@ python-dotenv>=1.0.0
 gspread>=6.0.0
 google-auth>=2.0.0
 
+# HTTP クライアント（LINE API 通知用）
+requests>=2.31.0
+
 # 本番用 WSGI サーバー
 gunicorn>=21.0.0
